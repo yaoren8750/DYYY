@@ -1158,6 +1158,11 @@ static UIViewController * getActiveTopController(void) {
                 }
             }
         }
+label.textColor = [UIColor colorWithRed:173/255.0 
+                                        green:216/255.0 
+                                         blue:230/255.0 
+                                        alpha:1.0]; // 浅蓝色
+
     }
     return label;
 }
