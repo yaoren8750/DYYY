@@ -177,7 +177,7 @@ typedef NS_ENUM(NSInteger, DYYYSettingItemType) {
         ],
         @[
             [DYYYSettingItem itemWithTitle:@"复制文案" key:@"DYYYCopyText" type:DYYYSettingItemTypeSwitch],
-            [DYYYSettingItem itemWithTitle:@"长按下载" key:@"DYYYLongPressDownload" type:DYYYSettingItemTypeSwitch]
+            [DYYYSettingItem itemWithTitle:@"长按下载" key:@"DYYYLongPressDownload" type:DYYYSettingItemTypeSwitch],
              [DYYYSettingItem itemWithTitle:@"双击下载" key:@"DYYYDoubleClickedDownload" type:DYYYSettingItemTypeSwitch],
             [DYYYSettingItem itemWithTitle:@"双击打开评论" key:@"DYYYDoubleClickedComment" type:DYYYSettingItemTypeSwitch],
           
