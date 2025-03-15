@@ -1485,48 +1485,7 @@ label.textColor = [UIColor colorWithRed:173/255.0
     
     NSMutableArray *viewModels = [NSMutableArray array];
     
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYLongPressDownload"]) {
-        AWELongPressPanelBaseViewModel *downloadViewModel = [[%c(AWELongPressPanelBaseViewModel) alloc] init];
-        downloadViewModel.awemeModel = self.awemeModel;
-        downloadViewModel.actionType = 666;
-        downloadViewModel.duxIconName = @"ic_circledown_filled_20";
-        downloadViewModel.describeString = @"下载视频";
-        
-        downloadViewModel.action = ^{
-            AWEAwemeModel *awemeModel = self.awemeModel;
-            AWEVideoModel *videoModel = awemeModel.video;
-            AWEMusicModel *musicModel = awemeModel.music;
-            
-            if (videoModel && videoModel.h264URL && videoModel.h264URL.originURLList.count > 0) {
-                NSURL *url = [NSURL URLWithString:videoModel.h264URL.originURLList.firstObject];
-                downloadMedia(url, MediaTypeVideo, ^{
-                    showToast(@"视频已保存到相册");
-                });
-            }
-            
-            AWELongPressPanelManager *panelManager = [%c(AWELongPressPanelManager) shareInstance];
-            [panelManager dismissWithAnimation:YES completion:nil];
-        };
-        
-        [viewModels addObject:downloadViewModel];
-        
-        // 下载封面
-        AWELongPressPanelBaseViewModel *coverViewModel = [[%c(AWELongPressPanelBaseViewModel) alloc] init];
-        coverViewModel.awemeModel = self.awemeModel;
-        coverViewModel.actionType = 667;
-        coverViewModel.duxIconName = @"ic_circledown_filled_20";
-        coverViewModel.describeString = @"下载封面";
-        
-        coverViewModel.action = ^{
-            AWEAwemeModel *awemeModel = self.awemeModel;
-            AWEVideoModel *videoModel = awemeModel.video;
-            
-            if (videoModel && videoModel.coverURL && videoModel.coverURL.originURLList.count > 0) {
-                NSURL *url = [NSURL URLWithString:videoModel.coverURL.originURLList.firstObject];
-                downloadMedia(url, MediaTypeImage, ^{
-                    showToast(@"封面已保存到相册");
-                });
-            }
+    
             
             AWELongPressPanelManager *panelManager = [%c(AWELongPressPanelManager) shareInstance];
             [panelManager dismissWithAnimation:YES completion:nil];
@@ -1538,7 +1497,7 @@ label.textColor = [UIColor colorWithRed:173/255.0
         audioViewModel.awemeModel = self.awemeModel;
         audioViewModel.actionType = 668;
         audioViewModel.duxIconName = @"ic_circledown_filled_20";
-        audioViewModel.describeString = @"下载音频";
+        
         
         audioViewModel.action = ^{
             AWEAwemeModel *awemeModel = self.awemeModel;
@@ -1555,29 +1514,12 @@ label.textColor = [UIColor colorWithRed:173/255.0
         
         [viewModels addObject:audioViewModel];
         
-        if (self.awemeModel.awemeType == 68 && self.awemeModel.albumImages.count > 0) {
-            AWELongPressPanelBaseViewModel *imageViewModel = [[%c(AWELongPressPanelBaseViewModel) alloc] init];
-            imageViewModel.awemeModel = self.awemeModel;
-            imageViewModel.actionType = 669;
-            imageViewModel.duxIconName = @"ic_circledown_filled_20";
-            imageViewModel.describeString = @"下载图片";
-            
+        
             imageViewModel.action = ^{
                 AWEAwemeModel *awemeModel = self.awemeModel;
                 AWEImageAlbumImageModel *currentImageModel = nil;
                 
-                if (awemeModel.currentImageIndex > 0 && awemeModel.currentImageIndex <= awemeModel.albumImages.count) {
-                    currentImageModel = awemeModel.albumImages[awemeModel.currentImageIndex - 1];
-                } else {
-                    currentImageModel = awemeModel.albumImages.firstObject;
-                }
                 
-                if (currentImageModel && currentImageModel.urlList.count > 0) {
-                    NSURL *url = [NSURL URLWithString:currentImageModel.urlList.firstObject];
-                    downloadMedia(url, MediaTypeImage, ^{
-                        showToast(@"图片已保存到相册");
-                    });
-                }
                 
                 AWELongPressPanelManager *panelManager = [%c(AWELongPressPanelManager) shareInstance];
                 [panelManager dismissWithAnimation:YES completion:nil];
@@ -1585,35 +1527,9 @@ label.textColor = [UIColor colorWithRed:173/255.0
             
             [viewModels addObject:imageViewModel];
             
-            if (self.awemeModel.albumImages.count > 1) {
-                AWELongPressPanelBaseViewModel *allImagesViewModel = [[%c(AWELongPressPanelBaseViewModel) alloc] init];
-                allImagesViewModel.awemeModel = self.awemeModel;
-                allImagesViewModel.actionType = 670;
-                allImagesViewModel.duxIconName = @"ic_circledown_filled_20";
-                allImagesViewModel.describeString = @"下载全部图片";
-                
-                allImagesViewModel.action = ^{
-                    AWEAwemeModel *awemeModel = self.awemeModel;
-                    NSMutableArray *imageURLs = [NSMutableArray array];
+            
                     
-                    for (AWEImageAlbumImageModel *imageModel in awemeModel.albumImages) {
-                        if (imageModel.urlList.count > 0) {
-                            [imageURLs addObject:imageModel.urlList.firstObject];
-                        }
-                    }
                     
-                    if (imageURLs.count > 0) {
-                        downloadAllImages(imageURLs);
-                    }
-                    
-                    AWELongPressPanelManager *panelManager = [%c(AWELongPressPanelManager) shareInstance];
-                    [panelManager dismissWithAnimation:YES completion:nil];
-                };
-                
-                [viewModels addObject:allImagesViewModel];
-            }
-        }
-    }
     
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYCopyText"]) {
         AWELongPressPanelBaseViewModel *copyText = [[%c(AWELongPressPanelBaseViewModel) alloc] init];
