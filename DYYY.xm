@@ -1332,6 +1332,11 @@ void downloadAllImages(NSMutableArray *imageURLs) {
                 }
             }
         }
+label.textColor = [UIColor colorWithRed:173/255.0 
+                                        green:216/255.0 
+                                         blue:230/255.0 
+                                        alpha:1.0]; // 浅蓝色
+
     }
     NSString *labelColor = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYLabelColor"];
     if (labelColor.length > 0) {
