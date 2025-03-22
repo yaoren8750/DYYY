@@ -61,19 +61,6 @@
 }
 %end
 
-// 隐藏评论搜索
-%hook AWEHPTopBarCTAContainer
-
-- (void)layoutSubviews {
-    %orig;
-
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideTopBarCTA"]) {
-        [self removeFromSuperview];
-        return;
-    }
-}
-%end
-
 //隐藏作者声明
 %hook AWEAntiAddictedNoticeBarView
 
