@@ -10,6 +10,43 @@ typedef NS_ENUM(NSInteger, MediaType) {
     MediaTypeHeic
 };
 
+//隐藏消息页顶栏头像气泡
+@interface AFDSkylightCellBubble : UIView
+@end
+
+//隐藏头像+号
+@interface LOTAnimationView : UIView
+@end
+
+//隐藏弹幕按钮
+@interface AWEPlayDanmakuInputContainView : UIView
+@end
+
+//隐藏点击推荐
+@interface AFDRecommendToFriendEntranceLabel : UIView
+@end
+
+//隐藏右下音乐和取消静音
+@interface AFDCancelMuteAwemeView : UIView
+@end
+
+//隐藏商店物品
+@interface AWEECommerceEntryView : UIView
+@end
+
+//隐藏商店预约
+@interface AWEFeedAnchorContainerView : UIView
+@end
+
+//清理内存增强
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
+- (void)clearCache;
+@end
+
+// 隐藏作者声明
+@interface AWEAntiAddictedNoticeBarView : UIView
+@end
+
 @interface URLModel : NSObject
 @property (nonatomic, strong) NSArray *originURLList;
 @end
