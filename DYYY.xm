@@ -1281,7 +1281,7 @@
 %end
 
 %hook AWEFeedProgressSlider
- 
+
 //开启视频进度条后默认显示进度条的透明度否则有部分视频不会显示进度条以及秒数
 - (void)setAlpha:(CGFloat)alpha {
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisShowScheduleDisplay"]) {
@@ -1295,7 +1295,7 @@
         %orig;
     }
 }
- 
+
 // 确保即使进度条隐藏也可以拖动
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
     // 如果隐藏视频进度但显示进度时长，扩大判断区域以便于用户交互
@@ -1306,7 +1306,7 @@
     }
     return %orig;
 }
- 
+
 //MARK: 视频显示进度条以及视频进度秒数
 - (void)setLimitUpperActionArea:(BOOL)arg1 {
     %orig;
@@ -1359,9 +1359,9 @@
         [parentView addSubview:rightLabel];
     }
 }
- 
+
 %end
- 
+
 //MARK: 视频显示-算法
 %hook AWEPlayInteractionProgressController
 %new
@@ -1398,7 +1398,7 @@
         return [NSString stringWithFormat:@"%02ld:%02ld", (long)minutes, (long)secs];
     }
 }
- 
+
 - (void)updateProgressSliderWithTime:(CGFloat)arg1 totalDuration:(CGFloat)arg2 {
     %orig;
     //如果开启了显示视频进度
@@ -1422,7 +1422,7 @@
         }
     }
 }
- 
+
 // 增加检测是否隐藏视频进度条的处理
 - (void)setHidden:(BOOL)hidden {
     %orig;
@@ -1435,7 +1435,7 @@
         self.alpha = 0;
     }
 }
- 
+
 %end
 
 %hook AWENormalModeTabBarTextView
