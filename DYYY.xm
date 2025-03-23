@@ -1157,6 +1157,18 @@
 }
 %end
 
+%hook AWEHPDiscoverFeedEntranceView
+- (void)setAlpha:(CGFloat)alpha {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideSearchButton"]) {
+        alpha = 0;
+        %orig(alpha);
+   }else {
+       %orig;
+    }
+}
+ 
+%end
+
 //评论区搜索等功能
 %hook UIView
 - (void)layoutSubviews {
