@@ -1692,18 +1692,6 @@
 
 %end
 
-%hook AWEHPDiscoverFeedEntranceView
-- (void)setAlpha:(CGFloat)alpha {
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideDiscover"]) {
-        alpha = 0;
-        %orig(alpha);
-   }else {
-       %orig;
-    }
-}
-
-%end
-
 %hook AWEFeedTemplateAnchorView
 
 - (void)layoutSubviews {
