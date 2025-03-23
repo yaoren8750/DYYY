@@ -180,7 +180,7 @@ typedef NS_ENUM(NSInteger, DYYYSettingItemType) {
             [DYYYSettingItem itemWithTitle:@"隐藏共创头像" key:@"DYYYHidegc" type:DYYYSettingItemTypeSwitch],
             [DYYYSettingItem itemWithTitle:@"隐藏提示黑框" key:@"DYYYHidehk" type:DYYYSettingItemTypeSwitch],
             [DYYYSettingItem itemWithTitle:@"隐藏昵称文案" key:@"DYYYHidenc" type:DYYYSettingItemTypeSwitch],
-            [DYYYSettingItem itemWithTitle:@"隐藏挑战提示" key:@"DYYYHidetz" type:DYYYSettingItemTypeSwitch],
+            [DYYYSettingItem itemWithTitle:@"隐藏挑战提示" key:@"DYYYHideGuideTip" type:DYYYSettingItemTypeSwitch],
             [DYYYSettingItem itemWithTitle:@"隐藏同城发现" key:@"DYYYHidetc" type:DYYYSettingItemTypeSwitch],
         ],
         @[
