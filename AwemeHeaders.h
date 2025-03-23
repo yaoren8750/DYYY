@@ -14,10 +14,6 @@ typedef NS_ENUM(NSInteger, MediaType) {
 @interface ACCordernQuickFlashStickerView : UIView
 @end
 
-//左下作者昵称
-@interface AWEBaseElementView : UIView
-@end
-
 //同城发现提示
 @interface AWENearbySkyLightCapsuleView : UIView
 @end
