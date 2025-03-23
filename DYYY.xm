@@ -16,27 +16,19 @@
 - (void)layoutSubviews {
     // 检查是否需要隐藏视图
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidetz"]) {
-        // 类型安全检查 + 隐藏逻辑
-        if ([self respondsToSelector:@selector(removeFromSuperview)]) {
-            [self removeFromSuperview]; // 从父视图中移除
-        }
-        self.hidden = YES; // 隐藏视图
+        self.hidden = YES; // 直接隐藏视图
         return; // 直接返回，不执行原始逻辑
     }
     %orig; // 调用原始的 layoutSubviews 方法
 }
 %end
 
-//移除文案昵称
+//隐藏昵称文案
 %hook AWEBaseElementView
 - (void)layoutSubviews {
     // 检查是否需要隐藏视图
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidenc"]) {
-        // 类型安全检查 + 隐藏逻辑
-        if ([self respondsToSelector:@selector(removeFromSuperview)]) {
-            [self removeFromSuperview]; // 从父视图中移除
-        }
-        self.hidden = YES; // 隐藏视图
+        self.hidden = YES; // 直接隐藏视图
         return; // 直接返回，不执行原始逻辑
     }
     %orig; // 调用原始的 layoutSubviews 方法
