@@ -520,16 +520,25 @@
 
 // 双击视频触发弹窗
 - (void)onPlayer:(id)arg0 didDoubleClick:(id)arg1 {
-    // 检查开关状态
+    // 检查是否启用直接打开评论区功能
+    BOOL isDirectCommentEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYEnableDirectComment"];
+    
+    if (isDirectCommentEnabled) {
+        // 如果直接打开评论区功能启用，则直接调用打开评论区的逻辑
+        [self performCommentAction];
+        return;
+    }
+    
+    // 检查是否启用双击弹窗功能
     BOOL isPopupEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYEnableDoubleOpenComment"];
     
     if (!isPopupEnabled) {
-        // 如果开关关闭，执行原始的双击逻辑
+        // 如果弹窗功能关闭，执行原始的双击逻辑
         %orig;
         return;
     }
     
-    // 如果开关打开，显示弹窗
+    // 如果弹窗功能打开，显示弹窗
     UIAlertController *alertController = [UIAlertController
         alertControllerWithTitle:@"选择操作"
         message:@""
@@ -561,12 +570,28 @@
 
     // 显示弹窗
     UIViewController *topController = [DYYYManager getActiveTopController];
-    if (topController) {
-        [topController presentViewController:alertController animated:YES completion:nil];
+    if (!topController) {
+        // 如果获取不到顶层控制器，使用当前控制器
+        topController = self;
     }
+
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        // 在 iPad 上使用 popover 样式
+        alertController.popoverPresentationController.sourceView = self.view;
+        alertController.popoverPresentationController.sourceRect = CGRectMake(self.view.bounds.size.width / 2.0, self.view.bounds.size.height / 2.0, 1.0, 1.0);
+    }
+
+    [topController presentViewController:alertController animated:YES completion:nil];
 
     // 阻止原始的双击逻辑
     return;
+}
+
+// 打开评论区的逻辑
+- (void)performCommentAction {
+    // 这里实现打开评论区的逻辑
+    // 例如：调用打开评论区的 API 或方法
+    NSLog(@"打开评论区");
 }
 
 %end
