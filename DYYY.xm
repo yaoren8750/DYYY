@@ -589,9 +589,13 @@
 
 // 打开评论区的逻辑
 - (void)performCommentAction {
-    // 这里实现打开评论区的逻辑
-    // 例如：调用打开评论区的 API 或方法
-    NSLog(@"打开评论区");
+    NSLog(@"尝试打开评论区");
+    // 假设抖音的打开评论区方法是 `openCommentSection`
+    if ([self respondsToSelector:@selector(openCommentSection)]) {
+        [self performSelector:@selector(openCommentSection)];
+    } else {
+        NSLog(@"打开评论区方法不存在");
+    }
 }
 
 %end
