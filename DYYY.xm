@@ -1282,7 +1282,7 @@
 
 %hook AWEFeedProgressSlider
 
-//开启视频进度
+// 开启视频进度
 - (void)setAlpha:(CGFloat)alpha {
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisShowScheduleDisplay"]) {
         // 如果启用了隐藏视频进度，进度条透明度为0
@@ -1307,15 +1307,14 @@
     return %orig;
 }
 
-//MARK: 视频显示进度条以及视频进度秒数
+// MARK: 视频显示进度条以及视频进度秒数
 - (void)setLimitUpperActionArea:(BOOL)arg1 {
     %orig;
-    //定义一下进度条默认算法
-    NSString *duration = [self.progressSliderDelegate formatTimeFromSeconds:floor(self.progressSliderDelegate.model.videoDuration/1000)];
-    //如果开启了显示时间进度
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisShowScheduleDisplay"]) {
+    
+    // 如果开启了显示时间进度
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisShowScheduleDisplay"]) {
         UIView *parentView = self.superview;
-        if(!parentView) return;
+        if (!parentView) return;
         
         // 移除之前可能存在的标签
         [[parentView viewWithTag:10001] removeFromSuperview];
@@ -1325,7 +1324,7 @@
         CGRect sliderFrame = [self convertRect:self.bounds toView:parentView];
         
         // 获取垂直偏移量配置值，默认为-12.5
-        CGFloat verticalOffset = -12.5
+        CGFloat verticalOffset = -12.5;
         NSString *offsetValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYTimelineVerticalPosition"];
         if (offsetValue.length > 0) {
             CGFloat configOffset = [offsetValue floatValue];
@@ -1338,7 +1337,7 @@
         UILabel *leftLabel = [[UILabel alloc] init];
         leftLabel.frame = CGRectMake(sliderFrame.origin.x, 
                                      sliderFrame.origin.y + verticalOffset, 
-                                     50, -12.5);
+                                     50, 12.5); // 修正高度为正值
         leftLabel.backgroundColor = [UIColor clearColor];
         [leftLabel setText:@"00:00"];
         [leftLabel setTextColor:[UIColor whiteColor]];
@@ -1350,9 +1349,9 @@
         UILabel *rightLabel = [[UILabel alloc] init];
         rightLabel.frame = CGRectMake(sliderFrame.origin.x + sliderFrame.size.width - 25, 
                                       sliderFrame.origin.y + verticalOffset, 
-                                      50, -12.5);
+                                      50, 12.5); // 修正高度为正值
         rightLabel.backgroundColor = [UIColor clearColor];
-        [rightLabel setText:duration];
+        [rightLabel setText:[self.progressSliderDelegate formatTimeFromSeconds:floor(self.progressSliderDelegate.model.videoDuration / 1000)]];
         [rightLabel setTextColor:[UIColor whiteColor]];
         [rightLabel setFont:[UIFont systemFontOfSize:8]];
         rightLabel.tag = 10002;
@@ -1362,62 +1361,41 @@
 
 %end
 
-//MARK: 视频显示-算法
+// MARK: 视频显示-算法
 %hook AWEPlayInteractionProgressController
+
 %new
-//根据时间来给算法
+// 根据时间来格式化字符串
 - (NSString *)formatTimeFromSeconds:(CGFloat)seconds {
-    //小时
     NSInteger hours = (NSInteger)seconds / 3600;
-    //分钟
     NSInteger minutes = ((NSInteger)seconds % 3600) / 60;
-    //秒数
     NSInteger secs = (NSInteger)seconds % 60;
     
-    //定义进度条实例
-    AWEFeedProgressSlider *progressSlider = self.progressSlider;
-    UIView *parentView = progressSlider.superview;
-    UILabel *rightLabel = [parentView viewWithTag:10002];
-    
-    //如果视频超过 60 分钟
     if (hours > 0) {
-        //主线程设置他的显示总时间进度条位置
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (rightLabel) {
-                CGRect sliderFrame = [progressSlider convertRect:progressSlider.bounds toView:parentView];
-                CGRect frame = rightLabel.frame;
-                frame.origin.x = sliderFrame.origin.x + sliderFrame.size.width - 46;
-                // 保持原来的垂直位置
-                rightLabel.frame = frame;
-            }
-        });
-        //返回 00:00:00
         return [NSString stringWithFormat:@"%02ld:%02ld:%02ld", (long)hours, (long)minutes, (long)secs];
     } else {
-        //返回 00:00
         return [NSString stringWithFormat:@"%02ld:%02ld", (long)minutes, (long)secs];
     }
 }
 
 - (void)updateProgressSliderWithTime:(CGFloat)arg1 totalDuration:(CGFloat)arg2 {
     %orig;
-    //如果开启了显示视频进度
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisShowScheduleDisplay"]) {
-        //获取进度条实例
+    
+    // 如果开启了显示视频进度
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisShowScheduleDisplay"]) {
         AWEFeedProgressSlider *progressSlider = self.progressSlider;
         UIView *parentView = progressSlider.superview;
         
         UILabel *leftLabel = [parentView viewWithTag:10001];
         UILabel *rightLabel = [parentView viewWithTag:10002];
         
-        //如果检测到时间
+        // 更新左侧时间标签
         if (arg1 > 0 && leftLabel) {
-            //创建左边的文本进度并且算法格式化时间
             [leftLabel setText:[self formatTimeFromSeconds:arg1]];
         }
-        //如果检测到时间
+        
+        // 更新右侧时间标签
         if (arg2 > 0 && rightLabel) {
-            //创建右边的文本进度条并且算法格式化时间
             [rightLabel setText:[self formatTimeFromSeconds:arg2]];
         }
     }
