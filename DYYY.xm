@@ -524,8 +524,8 @@
     BOOL isDirectCommentEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYEnableDirectComment"];
     
     if (isDirectCommentEnabled) {
-        // 如果直接打开评论区功能启用，则直接调用打开评论区的逻辑
-        [self performCommentAction];
+        // 如果直接打开评论区功能启用，则模拟点击评论按钮
+        [self simulateCommentButtonClick];
         return;
     }
     
@@ -549,8 +549,8 @@
         actionWithTitle:@"打开评论区"
         style:UIAlertActionStyleDefault
         handler:^(UIAlertAction *action) {
-            // 调用打开评论区的逻辑
-            [self performCommentAction];
+            // 模拟点击评论按钮
+            [self simulateCommentButtonClick];
         }]];
 
     // 添加“点赞视频”选项
@@ -587,14 +587,15 @@
     return;
 }
 
-// 打开评论区的逻辑
-- (void)performCommentAction {
-    NSLog(@"尝试打开评论区");
-    // 假设抖音的打开评论区方法是 `openCommentSection`
-    if ([self respondsToSelector:@selector(openCommentSection)]) {
-        [self performSelector:@selector(openCommentSection)];
+// 模拟点击评论按钮
+- (void)simulateCommentButtonClick {
+    // 通过调试找到评论按钮的实例
+    UIButton *commentButton = ...; // 替换为实际的评论按钮实例
+    if (commentButton) {
+        [commentButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+        NSLog(@"模拟点击评论按钮");
     } else {
-        NSLog(@"打开评论区方法不存在");
+        NSLog(@"未找到评论按钮");
     }
 }
 
