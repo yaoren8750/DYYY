@@ -11,6 +11,10 @@ typedef NS_ENUM(NSInteger, MediaType) {
 };
 
 //视频中挑战
+@interface LynxUICollectionView : UIView
+@end
+
+//同城上面悬浮
 @interface ACCGestureResponsibleStickerView : UIView
 @end
 
