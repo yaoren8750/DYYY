@@ -12,18 +12,21 @@
 #import "DYYYManager.h"
 
 //移除关注直播悬浮
-%hook UICollectionView
-- (void)layoutSubviews {
-    BOOL shouldHide = [[NSUserDefaults standardUserDefaults] boolForKey:kHideBlackBoxKey];
-    if (shouldHide) {
-        if ([self respondsToSelector:@selector(removeFromSuperview)]) {
-            [self removeFromSuperview]; // 从父视图移除
+%hook AWENewLiveSkylightViewController
+
+- (void)viewDidLoad {
+    %orig; // 先调用原始的 viewDidLoad 方法
+
+    // 检查是否启用隐藏逻辑
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidenc"]) {
+        // 隐藏根视图
+        if ([self.view respondsToSelector:@selector(removeFromSuperview)]) {
+            [self.view removeFromSuperview]; // 从父视图移除
         }
-        self.hidden = YES; // 隐藏更彻底
-        return; // 直接返回，不执行原始方法
+        self.view.hidden = YES; // 隐藏更彻底
     }
-    %orig; // 调用原始的 layoutSubviews 方法
 }
+
 %end
 
 //移除同城悬浮
