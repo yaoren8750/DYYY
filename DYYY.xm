@@ -11,17 +11,99 @@
 #import "AwemeHeaders.h"
 #import "DYYYManager.h"
 
+//移除视频中的挑战
+%hook ACCordernQuickFlashStickerView
+- (void)layoutSubviews {
+    // 检查是否需要隐藏视图
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidetz"]) {
+        // 类型安全检查 + 隐藏逻辑
+        if ([self respondsToSelector:@selector(removeFromSuperview)]) {
+            [self removeFromSuperview]; // 从父视图中移除
+        }
+        self.hidden = YES; // 隐藏视图
+        return; // 直接返回，不执行原始逻辑
+    }
+    %orig; // 调用原始的 layoutSubviews 方法
+}
+%end
+
+//移除文案昵称
+%hook AWEBaseElementView
+- (void)layoutSubviews {
+    // 检查是否需要隐藏视图
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidenc"]) {
+        // 类型安全检查 + 隐藏逻辑
+        if ([self respondsToSelector:@selector(removeFromSuperview)]) {
+            [self removeFromSuperview]; // 从父视图中移除
+        }
+        self.hidden = YES; // 隐藏视图
+        return; // 直接返回，不执行原始逻辑
+    }
+    %orig; // 调用原始的 layoutSubviews 方法
+}
+%end
+
+//移除同城发现提示框
+%hook AWENearbySkyLightCapsuleView
+- (void)layoutSubviews {
+    // 检查是否需要隐藏视图
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidetc"]) {
+        // 类型安全检查 + 隐藏逻辑
+        if ([self respondsToSelector:@selector(removeFromSuperview)]) {
+            [self removeFromSuperview]; // 从父视图中移除
+        }
+        self.hidden = YES; // 隐藏视图
+        return; // 直接返回，不执行原始逻辑
+    }
+    %orig; // 调用原始的 layoutSubviews 方法
+}
+%end
+
+//移除共创头像
+%hook AWEPlayInteractionCoCreatorNewInfoView
+- (void)layoutSubviews {
+    // 检查是否需要隐藏视图
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidegc"]) {
+        // 类型安全检查 + 隐藏逻辑
+        if ([self respondsToSelector:@selector(removeFromSuperview)]) {
+            [self removeFromSuperview]; // 从父视图中移除
+        }
+        self.hidden = YES; // 隐藏视图
+        return; // 直接返回，不执行原始逻辑
+    }
+    %orig; // 调用原始的 layoutSubviews 方法
+}
+%end
+
+//移除文案下面黑框合集推荐
+%hook AWETemplateCommonView
+- (void)layoutSubviews {
+    // 类型安全检查 + 隐藏逻辑
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidehk"]) {
+        if ([self respondsToSelector:@selector(removeFromSuperview)]) {
+            [self removeFromSuperview];
+        }
+        self.hidden = YES; // 隐藏更彻底
+        return;
+    }
+    %orig;
+}
+%end
+
 //隐藏作者声明
 %hook AWEAntiAddictedNoticeBarView
-
 - (void)layoutSubviews {
-    %orig;
-
+    // 检查是否需要隐藏视图
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"HideAntiAddictedNoticeBar"]) {
-        self.hidden = YES;
+        // 类型安全检查 + 隐藏逻辑
+        if ([self respondsToSelector:@selector(removeFromSuperview)]) {
+            [self removeFromSuperview]; // 从父视图中移除
+        }
+        self.hidden = YES; // 隐藏视图
+        return; // 直接返回，不执行原始逻辑
     }
+    %orig; // 调用原始的 layoutSubviews 方法
 }
-
 %end
 
 // 隐藏消息页顶栏头像气泡
