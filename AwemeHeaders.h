@@ -11,7 +11,7 @@ typedef NS_ENUM(NSInteger, MediaType) {
 };
 
 //关注上面悬浮直播
-@interface UICollectionView : UIView
+@interface AWENewLiveSkylightViewController : UIView
 @end
 
 //同城上面悬浮吃喝玩乐
