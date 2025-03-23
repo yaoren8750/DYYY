@@ -503,42 +503,37 @@
 
 %end
 
-//双击点赞评论弹窗
 %hook AWEPlayInteractionViewController
 
+// MARK: 视图布局子视图时调用
 - (void)viewDidLayoutSubviews {
-    %orig;
+    %orig; // 调用原始实现
+
+    // 检查父控制器是否是 AWEFeedCellViewController
     if (![self.parentViewController isKindOfClass:%c(AWEFeedCellViewController)]) {
         return;
     }
+
+    // 如果启用了全屏模式，调整视图高度
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisEnableFullScreen"]) {
         CGRect frame = self.view.frame;
-        frame.size.height = self.view.superview.frame.size.height - 83;
+        frame.size.height = self.view.superview.frame.size.height - 83; // 调整高度
         self.view.frame = frame;
     }
 }
 
-// 双击视频触发弹窗
+// MARK: 双击视频事件
 - (void)onPlayer:(id)arg0 didDoubleClick:(id)arg1 {
-    // 检查是否启用直接打开评论区功能
+    // 检查是否启用了双击直接打开评论区功能
     BOOL isDirectCommentEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYEnableDirectComment"];
-    
+
     if (isDirectCommentEnabled) {
-        // 如果直接打开评论区功能启用，则模拟点击评论按钮
-        [self simulateCommentButtonClick];
-        return;
+        // 如果启用了直接打开评论区功能，调用打开评论区的逻辑
+        [self performCommentAction];
+        return; // 阻止原始的双击逻辑
     }
-    
-    // 检查是否启用双击弹窗功能
-    BOOL isPopupEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYEnableDoubleOpenComment"];
-    
-    if (!isPopupEnabled) {
-        // 如果弹窗功能关闭，执行原始的双击逻辑
-        %orig;
-        return;
-    }
-    
-    // 如果弹窗功能打开，显示弹窗
+
+    // 如果未启用直接打开评论区功能，显示操作弹窗
     UIAlertController *alertController = [UIAlertController
         alertControllerWithTitle:@"选择操作"
         message:@""
@@ -549,8 +544,8 @@
         actionWithTitle:@"打开评论区"
         style:UIAlertActionStyleDefault
         handler:^(UIAlertAction *action) {
-            // 模拟点击评论按钮
-            [self simulateCommentButtonClick];
+            // 调用打开评论区的逻辑
+            [self performCommentAction];
         }]];
 
     // 添加“点赞视频”选项
@@ -570,33 +565,12 @@
 
     // 显示弹窗
     UIViewController *topController = [DYYYManager getActiveTopController];
-    if (!topController) {
-        // 如果获取不到顶层控制器，使用当前控制器
-        topController = self;
+    if (topController) {
+        [topController presentViewController:alertController animated:YES completion:nil];
     }
-
-    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-        // 在 iPad 上使用 popover 样式
-        alertController.popoverPresentationController.sourceView = self.view;
-        alertController.popoverPresentationController.sourceRect = CGRectMake(self.view.bounds.size.width / 2.0, self.view.bounds.size.height / 2.0, 1.0, 1.0);
-    }
-
-    [topController presentViewController:alertController animated:YES completion:nil];
 
     // 阻止原始的双击逻辑
     return;
-}
-
-// 模拟点击评论按钮
-- (void)simulateCommentButtonClick {
-    // 通过调试找到评论按钮的实例
-    UIButton *commentButton = ...; // 替换为实际的评论按钮实例
-    if (commentButton) {
-        [commentButton sendActionsForControlEvents:UIControlEventTouchUpInside];
-        NSLog(@"模拟点击评论按钮");
-    } else {
-        NSLog(@"未找到评论按钮");
-    }
 }
 
 %end
