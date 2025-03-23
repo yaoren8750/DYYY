@@ -18,7 +18,7 @@
     %orig; // 先调用原始的 viewDidLoad 方法
 
     // 检查是否启用隐藏逻辑
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidenc"]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidezbxf"]) {
         // 隐藏根视图
         if ([self.view respondsToSelector:@selector(removeFromSuperview)]) {
             [self.view removeFromSuperview]; // 从父视图移除
