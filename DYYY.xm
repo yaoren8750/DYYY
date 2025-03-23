@@ -928,7 +928,6 @@
 
 %end
 
-//右侧按钮
 %hook AWELeftSideBarEntranceView
 
 - (instancetype)initWithFrame:(CGRect)frame {
