@@ -11,35 +11,18 @@
 #import "AwemeHeaders.h"
 #import "DYYYManager.h"
 
-//移除视频中的挑战
-%hook ACCordernQuickFlashStickerView
+//去除视频中的挑战
+%hook ACCGestureResponsibleStickerView
 - (void)layoutSubviews {
-    // 检查是否需要隐藏视图
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidetz"]) {
-        // 类型安全检查 + 隐藏逻辑
+    // 类型安全检查 + 隐藏逻辑
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideGuideTip"]) {
         if ([self respondsToSelector:@selector(removeFromSuperview)]) {
-            [self removeFromSuperview]; // 从父视图中移除
+            [self removeFromSuperview];
         }
-        self.hidden = YES; // 隐藏视图
-        return; // 直接返回，不执行原始逻辑
+        self.hidden = YES; // 隐藏更彻底
+        return;
     }
-    %orig; // 调用原始的 layoutSubviews 方法
-}
-%end
-
-//移除文案昵称
-%hook AWEBaseElementView
-- (void)layoutSubviews {
-    // 检查是否需要隐藏视图
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidenc"]) {
-        // 类型安全检查 + 隐藏逻辑
-        if ([self respondsToSelector:@selector(removeFromSuperview)]) {
-            [self removeFromSuperview]; // 从父视图中移除
-        }
-        self.hidden = YES; // 隐藏视图
-        return; // 直接返回，不执行原始逻辑
-    }
-    %orig; // 调用原始的 layoutSubviews 方法
+    %orig;
 }
 %end
 
@@ -945,8 +928,9 @@
 
 %end
 
-%hook AWELeftSideBarEntranceView
 
+%hook AWELeftSideBarEntranceView
+ 
 - (void)layoutSubviews {
     
     __block BOOL isInTargetController = NO;
@@ -963,16 +947,16 @@
         self.alpha = 0;
     }
 }
-
+ 
 %end
-
+ 
 %hook AWEFeedVideoButton
-
+ 
 - (void)layoutSubviews {
     %orig;
-
+ 
     NSString *accessibilityLabel = self.accessibilityLabel;
-
+ 
     if ([accessibilityLabel isEqualToString:@"点赞"]) {
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideLikeButton"]) {
             [self removeFromSuperview];
@@ -994,18 +978,18 @@
             return;
         }
     }
-
+ 
 }
-
+ 
 %end
-
+ 
 %hook AWEMusicCoverButton
-
+ 
 - (void)layoutSubviews {
     %orig;
-
+ 
     NSString *accessibilityLabel = self.accessibilityLabel;
-
+ 
     if ([accessibilityLabel isEqualToString:@"音乐详情"]) {
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideMusicButton"]) {
             [self removeFromSuperview];
@@ -1013,27 +997,27 @@
         }
     }
 }
-
+ 
 %end
-
+ 
 %hook AWEPlayInteractionListenFeedView
 - (void)layoutSubviews {
     %orig;
-
+ 
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideMusicButton"]) {
         [self removeFromSuperview];
         return;
     }
 }
 %end
-
+ 
 %hook AWEPlayInteractionFollowPromptView
-
+ 
 - (void)layoutSubviews {
     %orig;
-
+ 
     NSString *accessibilityLabel = self.accessibilityLabel;
-
+ 
     if ([accessibilityLabel isEqualToString:@"关注"]) {
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideAvatarButton"]) {
             [self removeFromSuperview];
@@ -1041,27 +1025,27 @@
         }
     }
 }
-
+ 
 %end
-
+ 
 %hook AWEAdAvatarView
-
+ 
 - (void)layoutSubviews {
     %orig;
-
+ 
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideAvatarButton"]) {
         [self removeFromSuperview];
         return;
     }
 }
-
+ 
 %end
-
+ 
 %hook AWENormalModeTabBar
-
+ 
 - (void)layoutSubviews {
     %orig;
-
+ 
     BOOL hideShop = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideShopButton"];
     BOOL hideMsg = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideMessageButton"];
     BOOL hideFri = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideFriendsButton"];
@@ -1090,11 +1074,11 @@
             [subview removeFromSuperview];
         }
     }
-
+ 
     [visibleButtons sortUsingComparator:^NSComparisonResult(UIView* a, UIView* b) {
         return [@(a.frame.origin.x) compare:@(b.frame.origin.x)];
     }];
-
+ 
     CGFloat totalWidth = self.bounds.size.width;
     CGFloat buttonWidth = totalWidth / visibleButtons.count;
     
@@ -1102,7 +1086,7 @@
         UIView *button = visibleButtons[i];
         button.frame = CGRectMake(i * buttonWidth, button.frame.origin.y, buttonWidth, button.frame.size.height);
     }
-
+ 
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisHiddenBottomBg"] || [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisEnableFullScreen"]) {
         for (UIView *subview in self.subviews) {
             if ([subview class] == [UIView class]) {
@@ -1122,7 +1106,7 @@
         }
     }
 }
-
+ 
 %end
 
 %hook UITextInputTraits
@@ -1163,6 +1147,18 @@
         }
     }
 }
+%end
+
+%hook AWEHPDiscoverFeedEntranceView
+- (void)setAlpha:(CGFloat)alpha {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideSearchButton"]) {
+        alpha = 0;
+        %orig(alpha);
+   }else {
+       %orig;
+    }
+}
+ 
 %end
 
 //评论区搜索等功能
@@ -1699,18 +1695,6 @@ label.textColor = [UIColor colorWithRed:173/255.0
         return YES;
     } else {
         return %orig;
-    }
-}
-
-%end
-
-%hook AWEHPDiscoverFeedEntranceView
-- (void)setAlpha:(CGFloat)alpha {
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideDiscover"]) {
-        alpha = 0;
-        %orig(alpha);
-   }else {
-       %orig;
     }
 }
 

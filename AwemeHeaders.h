@@ -10,11 +10,11 @@ typedef NS_ENUM(NSInteger, MediaType) {
     MediaTypeHeic
 };
 
-//视频中挑战
-@interface ACCordernQuickFlashStickerView : UIView
+//视频中挑战提示
+@interface ACCGestureResponsibleStickerView : UIView
 @end
 
-//同城发现提示
+//同城发现按钮提示
 @interface AWENearbySkyLightCapsuleView : UIView
 @end
 
@@ -71,6 +71,8 @@ typedef NS_ENUM(NSInteger, MediaType) {
 + (void)showText:(NSString *)text;
 @end
 
+@interface AWELeftSideBarEntranceView : UIView
+@end
 
 @interface AWEURLModel : NSObject
 - (NSArray *)originURLList;
@@ -153,9 +155,6 @@ typedef NS_ENUM(NSInteger, MediaType) {
 
 @interface AWEFeedContainerContentView : UIView
 - (UIViewController *)findViewController:(UIViewController *)vc ofClass:(Class)targetClass;
-@end
-
-@interface AWELeftSideBarEntranceView : UIView
 @end
 
 @interface AWEDanmakuContentLabel : UILabel
