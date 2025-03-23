@@ -72,6 +72,24 @@ typedef NS_ENUM(NSInteger, MediaType) {
 @end
 
 @interface AWELeftSideBarEntranceView : UIView
+- (void)updateHiddenState;
+@end
+
+@implementation AWELeftSideBarEntranceView : UIView
+- (void)updateHiddenState {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        BOOL shouldHide = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisHiddenLeftSideBar"];
+        if (shouldHide) {
+            self.alpha = 0;
+            self.hidden = YES;
+            self.userInteractionEnabled = NO;
+        } else {
+            self.alpha = 1;
+            self.hidden = NO;
+            self.userInteractionEnabled = YES;
+        }
+    });
+}
 @end
 
 @interface AWEURLModel : NSObject
