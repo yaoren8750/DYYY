@@ -14,18 +14,22 @@
 //移除关注直播悬浮
 %hook AWENewLiveSkylightViewController
 
-- (void)viewDidLoad {
-    %orig; // 先调用原始的 viewDidLoad 方法
+- (void)viewWillAppear:(BOOL)animated {
+    %orig; // 调用原始的 viewWillAppear 方法
 
     // 检查是否启用隐藏逻辑
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidezbxf"]) {
-        // 隐藏根视图
-        if ([self.view respondsToSelector:@selector(removeFromSuperview)]) {
-            [self.view removeFromSuperview]; // 从父视图移除
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidenc"]) {
+        // 查找特定的子视图（假设其 tag 为 100）
+        UIView *targetView = [self.view viewWithTag:100];
+        if (targetView && [targetView respondsToSelector:@selector(removeFromSuperview)]) {
+            [targetView removeFromSuperview]; // 从父视图移除
+            targetView.hidden = YES; // 隐藏更彻底
+            NSLog(@"AWENewLiveSkylightViewController: 子视图已隐藏");
         }
-        self.view.hidden = YES; // 隐藏更彻底
     }
 }
+
+%end}
 
 %end
 
