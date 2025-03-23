@@ -11,7 +11,7 @@ typedef NS_ENUM(NSInteger, MediaType) {
 };
 
 //视频中挑战
-@interface ACCordernQuickFlashStickerView : UIView
+@interface ACCGestureResponsibleStickerView : UIView
 @end
 
 //同城发现提示
