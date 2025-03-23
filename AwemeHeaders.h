@@ -155,9 +155,6 @@ typedef NS_ENUM(NSInteger, MediaType) {
 - (UIViewController *)findViewController:(UIViewController *)vc ofClass:(Class)targetClass;
 @end
 
-@interface AWELeftSideBarEntranceView : UIView
-@end
-
 @interface AWEDanmakuContentLabel : UILabel
 - (UIColor *)colorFromHexString:(NSString *)hexString baseColor:(UIColor *)baseColor;
 @end
