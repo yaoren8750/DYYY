@@ -10,19 +10,11 @@ typedef NS_ENUM(NSInteger, MediaType) {
     MediaTypeHeic
 };
 
-//关注上面悬浮直播
-@interface AWENewLiveSkylightViewController : UIView
-@end
-
-//同城上面悬浮吃喝玩乐
-@interface LynxUICollectionView : UIView
-@end
-
 //视频中挑战提示
 @interface ACCGestureResponsibleStickerView : UIView
 @end
 
-//同城发现提示
+//同城发现按钮提示
 @interface AWENearbySkyLightCapsuleView : UIView
 @end
 
