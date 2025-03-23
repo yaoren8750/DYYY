@@ -10,6 +10,26 @@ typedef NS_ENUM(NSInteger, MediaType) {
     MediaTypeHeic
 };
 
+//视频中挑战
+@interface ACCordernQuickFlashStickerView : UIView
+@end
+
+//左下作者昵称
+@interface AWEBaseElementView : UIView
+@end
+
+//同城发现提示
+@interface AWENearbySkyLightCapsuleView : UIView
+@end
+
+//共创头像
+@interface AWEPlayInteractionCoCreatorNewInfoView : UIView
+@end
+
+//文案下面黑框提示
+@interface AWETemplateCommonView : UIView
+@end
+
 // 隐藏左下作者声明
 @interface AWEAntiAddictedNoticeBarView : UIView
 @end
