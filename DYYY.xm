@@ -11,27 +11,18 @@
 #import "AwemeHeaders.h"
 #import "DYYYManager.h"
 
-//移除视频中的挑战
-%hook ACCordernQuickFlashStickerView
+//去除“视频”加入挑战
+%hook ACCGestureResponsibleStickerView
 - (void)layoutSubviews {
-    // 检查是否需要隐藏视图
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidetz"]) {
-        self.hidden = YES; // 直接隐藏视图
-        return; // 直接返回，不执行原始逻辑
+    // 类型安全检查 + 隐藏逻辑
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideGuideTip"]) {
+        if ([self respondsToSelector:@selector(removeFromSuperview)]) {
+            [self removeFromSuperview];
+        }
+        self.hidden = YES; // 隐藏更彻底
+        return;
     }
-    %orig; // 调用原始的 layoutSubviews 方法
-}
-%end
-
-//隐藏昵称文案
-%hook AWEBaseElementView
-- (void)layoutSubviews {
-    // 检查是否需要隐藏视图
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidenc"]) {
-        self.hidden = YES; // 直接隐藏视图
-        return; // 直接返回，不执行原始逻辑
-    }
-    %orig; // 调用原始的 layoutSubviews 方法
+    %orig;
 }
 %end
 
@@ -937,23 +928,40 @@
 
 %end
 
+//右侧按钮
 %hook AWELeftSideBarEntranceView
 
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = %orig;
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateHiddenState) name:NSUserDefaultsDidChangeNotification object:nil];
+    }
+    return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSUserDefaultsDidChangeNotification object:nil];
+    %orig;
+}
+
 - (void)layoutSubviews {
-    
-    __block BOOL isInTargetController = NO;
-    UIResponder *currentResponder = self;
-    
-    while ((currentResponder = [currentResponder nextResponder])) {
-        if ([currentResponder isKindOfClass:NSClassFromString(@"AWEUserHomeViewControllerV2")]) {
-            isInTargetController = YES;
-            break;
+    %orig;
+    [self updateHiddenState];
+}
+
+- (void)updateHiddenState {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        BOOL shouldHide = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisHiddenLeftSideBar"];
+        if (shouldHide) {
+            self.alpha = 0;
+            self.hidden = YES;
+            self.userInteractionEnabled = NO;
+        } else {
+            self.alpha = 1;
+            self.hidden = NO;
+            self.userInteractionEnabled = YES;
         }
-    }
-    
-    if (!isInTargetController&&[[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisHiddenLeftSideBar"]) {
-        self.alpha = 0;
-    }
+    });
 }
 
 %end
