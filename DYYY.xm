@@ -524,53 +524,60 @@
 
 // MARK: 双击视频事件
 - (void)onPlayer:(id)arg0 didDoubleClick:(id)arg1 {
+    // 检查是否启用了双击弹窗功能
+    BOOL isPopupEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYEnableDoubleOpenComment"];
     // 检查是否启用了双击直接打开评论区功能
-    BOOL isDirectCommentEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYEnableDirectComment"];
+    BOOL isDirectCommentEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYEnableDoubleTapComment"];
 
-    if (isDirectCommentEnabled) {
-        // 如果启用了直接打开评论区功能，调用打开评论区的逻辑
+    if (isPopupEnabled) {
+        // 显示弹窗
+        UIAlertController *alertController = [UIAlertController
+            alertControllerWithTitle:NSLocalizedString(@"选择操作", nil)
+            message:@""
+            preferredStyle:UIAlertControllerStyleActionSheet];
+
+        // 添加“打开评论区”选项
+        [alertController addAction:[UIAlertAction
+            actionWithTitle:NSLocalizedString(@"打开评论区", nil)
+            style:UIAlertActionStyleDefault
+            handler:^(UIAlertAction *action) {
+                [self performCommentAction]; // 调用打开评论区的逻辑
+            }]];
+
+        // 添加“点赞视频”选项
+        [alertController addAction:[UIAlertAction
+            actionWithTitle:NSLocalizedString(@"点赞视频", nil)
+            style:UIAlertActionStyleDefault
+            handler:^(UIAlertAction *action) {
+                %orig; // 调用原始的点赞逻辑
+            }]];
+
+        // 添加“取消”选项
+        [alertController addAction:[UIAlertAction
+            actionWithTitle:NSLocalizedString(@"取消", nil)
+            style:UIAlertActionStyleCancel
+            handler:nil]];
+
+        // 显示弹窗
+        UIViewController *topController = [DYYYManager getActiveTopController];
+        if (topController) {
+            // 适配 iPad
+            if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+                alertController.popoverPresentationController.sourceView = topController.view;
+                alertController.popoverPresentationController.sourceRect = CGRectMake(topController.view.bounds.size.width / 2, topController.view.bounds.size.height / 2, 1, 1);
+            }
+            [topController presentViewController:alertController animated:YES completion:nil];
+        }
+
+        return; // 阻止原始的双击逻辑
+    } else if (isDirectCommentEnabled) {
+        // 直接打开评论区
         [self performCommentAction];
         return; // 阻止原始的双击逻辑
     }
 
-    // 如果未启用直接打开评论区功能，显示操作弹窗
-    UIAlertController *alertController = [UIAlertController
-        alertControllerWithTitle:@"选择操作"
-        message:@""
-        preferredStyle:UIAlertControllerStyleActionSheet]; // 使用 ActionSheet 样式
-
-    // 添加“打开评论区”选项
-    [alertController addAction:[UIAlertAction
-        actionWithTitle:@"打开评论区"
-        style:UIAlertActionStyleDefault
-        handler:^(UIAlertAction *action) {
-            // 调用打开评论区的逻辑
-            [self performCommentAction];
-        }]];
-
-    // 添加“点赞视频”选项
-    [alertController addAction:[UIAlertAction
-        actionWithTitle:@"点赞视频"
-        style:UIAlertActionStyleDefault
-        handler:^(UIAlertAction *action) {
-            // 调用原始的点赞逻辑
-            %orig;
-        }]];
-
-    // 添加“取消”选项
-    [alertController addAction:[UIAlertAction
-        actionWithTitle:@"取消"
-        style:UIAlertActionStyleCancel
-        handler:nil]];
-
-    // 显示弹窗
-    UIViewController *topController = [DYYYManager getActiveTopController];
-    if (topController) {
-        [topController presentViewController:alertController animated:YES completion:nil];
-    }
-
-    // 阻止原始的双击逻辑
-    return;
+    // 如果两个功能都未启用，执行原始的点赞逻辑
+    %orig;
 }
 
 %end
