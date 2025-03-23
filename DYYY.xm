@@ -929,7 +929,7 @@
 %end
 
 %hook AWELeftSideBarEntranceView
-
+ 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = %orig;
     if (self) {
@@ -937,17 +937,17 @@
     }
     return self;
 }
-
+ 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSUserDefaultsDidChangeNotification object:nil];
     %orig;
 }
-
+ 
 - (void)layoutSubviews {
     %orig;
     [self updateHiddenState];
 }
-
+ 
 - (void)updateHiddenState {
     dispatch_async(dispatch_get_main_queue(), ^{
         BOOL shouldHide = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisHiddenLeftSideBar"];
@@ -962,16 +962,16 @@
         }
     });
 }
-
+ 
 %end
-
+ 
 %hook AWEFeedVideoButton
-
+ 
 - (void)layoutSubviews {
     %orig;
-
+ 
     NSString *accessibilityLabel = self.accessibilityLabel;
-
+ 
     if ([accessibilityLabel isEqualToString:@"点赞"]) {
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideLikeButton"]) {
             [self removeFromSuperview];
@@ -993,18 +993,18 @@
             return;
         }
     }
-
+ 
 }
-
+ 
 %end
-
+ 
 %hook AWEMusicCoverButton
-
+ 
 - (void)layoutSubviews {
     %orig;
-
+ 
     NSString *accessibilityLabel = self.accessibilityLabel;
-
+ 
     if ([accessibilityLabel isEqualToString:@"音乐详情"]) {
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideMusicButton"]) {
             [self removeFromSuperview];
@@ -1012,27 +1012,27 @@
         }
     }
 }
-
+ 
 %end
-
+ 
 %hook AWEPlayInteractionListenFeedView
 - (void)layoutSubviews {
     %orig;
-
+ 
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideMusicButton"]) {
         [self removeFromSuperview];
         return;
     }
 }
 %end
-
+ 
 %hook AWEPlayInteractionFollowPromptView
-
+ 
 - (void)layoutSubviews {
     %orig;
-
+ 
     NSString *accessibilityLabel = self.accessibilityLabel;
-
+ 
     if ([accessibilityLabel isEqualToString:@"关注"]) {
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideAvatarButton"]) {
             [self removeFromSuperview];
@@ -1040,27 +1040,27 @@
         }
     }
 }
-
+ 
 %end
-
+ 
 %hook AWEAdAvatarView
-
+ 
 - (void)layoutSubviews {
     %orig;
-
+ 
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideAvatarButton"]) {
         [self removeFromSuperview];
         return;
     }
 }
-
+ 
 %end
-
+ 
 %hook AWENormalModeTabBar
-
+ 
 - (void)layoutSubviews {
     %orig;
-
+ 
     BOOL hideShop = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideShopButton"];
     BOOL hideMsg = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideMessageButton"];
     BOOL hideFri = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideFriendsButton"];
@@ -1089,11 +1089,11 @@
             [subview removeFromSuperview];
         }
     }
-
+ 
     [visibleButtons sortUsingComparator:^NSComparisonResult(UIView* a, UIView* b) {
         return [@(a.frame.origin.x) compare:@(b.frame.origin.x)];
     }];
-
+ 
     CGFloat totalWidth = self.bounds.size.width;
     CGFloat buttonWidth = totalWidth / visibleButtons.count;
     
@@ -1101,7 +1101,7 @@
         UIView *button = visibleButtons[i];
         button.frame = CGRectMake(i * buttonWidth, button.frame.origin.y, buttonWidth, button.frame.size.height);
     }
-
+ 
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisHiddenBottomBg"] || [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisEnableFullScreen"]) {
         for (UIView *subview in self.subviews) {
             if ([subview class] == [UIView class]) {
@@ -1121,7 +1121,7 @@
         }
     }
 }
-
+ 
 %end
 
 %hook UITextInputTraits
