@@ -1282,7 +1282,7 @@
 
 %hook AWEFeedProgressSlider
 
-//开启视频进度条后默认显示进度条的透明度否则有部分视频不会显示进度条以及秒数
+//开启视频进度
 - (void)setAlpha:(CGFloat)alpha {
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisShowScheduleDisplay"]) {
         // 如果启用了隐藏视频进度，进度条透明度为0
