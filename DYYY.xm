@@ -1348,7 +1348,7 @@
         UILabel *leftLabel = [[UILabel alloc] init];
         leftLabel.frame = CGRectMake(sliderFrame.origin.x, 
                                      sliderFrame.origin.y + verticalOffset, 
-                                     50, 12.5); // 修正高度为正值
+                                     50, 15); // 修正高度为正值
         leftLabel.backgroundColor = [UIColor clearColor];
         [leftLabel setText:@"00:00"];
         [leftLabel setTextColor:[UIColor whiteColor]];
@@ -1360,7 +1360,7 @@
         UILabel *rightLabel = [[UILabel alloc] init];
         rightLabel.frame = CGRectMake(sliderFrame.origin.x + sliderFrame.size.width - 25, 
                                       sliderFrame.origin.y + verticalOffset, 
-                                      50, 12.5); // 修正高度为正值
+                                      50, 15); // 修正高度为正值
         rightLabel.backgroundColor = [UIColor clearColor];
         [rightLabel setText:[self.progressSliderDelegate formatTimeFromSeconds:floor(self.progressSliderDelegate.model.videoDuration / 1000)]];
         [rightLabel setTextColor:[UIColor whiteColor]];
