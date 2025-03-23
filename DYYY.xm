@@ -11,6 +11,22 @@
 #import "AwemeHeaders.h"
 #import "DYYYManager.h"
 
+//移除同城悬浮
+%hook LynxUICollectionView
+- (void)layoutSubviews {
+    // 检查是否启用隐藏逻辑
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHidenc"]) {
+        // 类型安全检查 + 隐藏逻辑
+        if ([self respondsToSelector:@selector(removeFromSuperview)]) {
+            [self removeFromSuperview]; // 从父视图移除
+        }
+        self.hidden = YES; // 隐藏更彻底
+        return; // 直接返回，不执行原始方法
+    }
+    %orig; // 调用原始的 layoutSubviews 方法
+}
+%end
+
 //去除“视频”加入挑战
 %hook ACCGestureResponsibleStickerView
 - (void)layoutSubviews {
