@@ -71,6 +71,8 @@ typedef NS_ENUM(NSInteger, MediaType) {
 + (void)showText:(NSString *)text;
 @end
 
+@interface AWELeftSideBarEntranceView : UIView
+@end
 
 @interface AWEURLModel : NSObject
 - (NSArray *)originURLList;
