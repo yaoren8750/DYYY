@@ -888,14 +888,15 @@ static void DYYYAddCustomViewToParent(UIView *parentView, float transparency) {
 %hook AWEAwemeModel
 - (id)initWithDictionary:(id)arg1 error:(id *)arg2 {
     id orig = %orig;
-
-    BOOL hasLiveStreamURLProperty = [self respondsToSelector:@selector(liveStreamURL)];
+    
+    //BOOL hasLiveStreamURLProperty = class_getProperty([AWEAwemeModel class], "liveStreamURL") != NULL;
+    BOOL hasLiveStreamURLProperty = [self valueForKey:@"liveStreamURL"] != nil;
     BOOL noAds = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYNoAds"];
-    BOOL skipLive = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipLive"];
+    
     BOOL skipHotSpot = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipHotSpot"];
     
     BOOL shouldFilterAds = noAds && (self.hotSpotLynxCardModel || self.isAds);
-    BOOL shouldFilterRec = skipLive && hasLiveStreamURLProperty;
+ 
     BOOL shouldFilterHotSpot = skipHotSpot && self.hotSpotLynxCardModel;
 
     BOOL shouldFilterLowLikes = NO;
@@ -970,18 +971,18 @@ static void DYYYAddCustomViewToParent(UIView *parentView, float transparency) {
             }
         }
     }
-    return (shouldFilterAds || shouldFilterRec || shouldFilterHotSpot || shouldFilterLowLikes || shouldFilterKeywords || shouldFilterTime) ? nil : orig;
+    return (shouldFilterAds || shouldFilterHotSpot || self.isLive  || shouldFilterLowLikes || shouldFilterKeywords || shouldFilterTime) ? nil : orig;
 }
 
 - (id)init {
     id orig = %orig;
-    
+
     BOOL noAds = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYNoAds"];
-    BOOL skipLive = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipLive"];
-    BOOL skipHotSpot = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipHotSpot"];
     
+    BOOL skipHotSpot = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipHotSpot"];
+
     BOOL shouldFilterAds = noAds && (self.hotSpotLynxCardModel || self.isAds);
-    BOOL shouldFilterRec = skipLive && [self.liveReason isEqualToString:@"rec"];
+    
     BOOL shouldFilterHotSpot = skipHotSpot && self.hotSpotLynxCardModel;
     
     BOOL shouldFilterLowLikes = NO;
@@ -1057,7 +1058,7 @@ static void DYYYAddCustomViewToParent(UIView *parentView, float transparency) {
         }
     }
     
-    return (shouldFilterAds || shouldFilterRec || shouldFilterHotSpot || shouldFilterLowLikes || shouldFilterKeywords || shouldFilterTime) ? nil : orig;
+    return (shouldFilterAds || shouldFilterHotSpot || self.isLive || shouldFilterLowLikes || shouldFilterKeywords || shouldFilterTime) ? nil : orig;
 }
 
 - (bool)preventDownload {
@@ -1076,6 +1077,55 @@ static void DYYYAddCustomViewToParent(UIView *parentView, float transparency) {
     
     %orig;
 }
+
+
+- (void)setLiveStreamURL:(id)url {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipLive"]) {
+        %orig(nil); 
+    } else {
+        %orig(url); 
+    }
+}
+
+
+- (id)liveStreamURl {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipLive"]) {
+        return nil;
+    }
+    return %orig;
+}
+
+- (void)live_callInitWithDictyCategoryMethod:(id)arg1 {
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipLive"]) {
+        %orig;
+    }
+}
+
++ (id)liveStreamURLJSONTransformer {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipLive"]) {
+        return nil;
+    }
+    return %orig;
+}
++ (id)relatedLiveJSONTransformer {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipLive"]) {
+        return nil;
+    }
+    return %orig;
+}
++ (id)rawModelFromLiveRoomModel:(id)arg1 {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipLive"]) {
+        return nil;
+    }
+    return %orig;
+}
++ (id)aweLiveRoom_subModelPropertyKey {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipLive"]) {
+        return nil;
+    }
+    return %orig;
+}
+
 
 %end
 
@@ -3553,36 +3603,40 @@ static BOOL isDownloadFlied = NO;
 
 //隐藏昵称右侧
 %hook UILabel 
-- (void)layoutSubviews {{
-    %orig;
+- (void)layoutSubviews { 
+    %orig; 
     
-    BOOL hideRightLabel = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideRightLable"];
-    if (!hideRightLabel) return;
+    BOOL hideRightLabel = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideRightLable"]; 
+    if (!hideRightLabel) return; 
     
-    NSString *accessibilityLabel = self.accessibilityLabel;
-    if (!accessibilityLabel || accessibilityLabel.length == 0) return;
+    NSString *accessibilityLabel = self.accessibilityLabel; 
+    if (!accessibilityLabel || accessibilityLabel.length == 0) return; 
     
-    NSString *trimmedLabel = [accessibilityLabel stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    BOOL shouldHide = NO;
+    NSString *trimmedLabel = [accessibilityLabel stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]; 
+    BOOL shouldHide = NO; 
     
-    if ([trimmedLabel hasSuffix:@"人共创"]) {
-        NSString *prefix = [trimmedLabel substringToIndex:trimmedLabel.length - 3];
-        NSCharacterSet *nonDigits = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
-        shouldHide = ([prefix rangeOfCharacterFromSet:nonDigits].location == NSNotFound);
-    }
+    if ([trimmedLabel hasSuffix:@"人共创"]) { 
+        NSString *prefix = [trimmedLabel substringToIndex:trimmedLabel.length - 3]; 
+        NSCharacterSet *nonDigits = [[NSCharacterSet decimalDigitCharacterSet] invertedSet]; 
+        shouldHide = ([prefix rangeOfCharacterFromSet:nonDigits].location == NSNotFound); 
+    } 
     
-    if (!shouldHide) {{
-        shouldHide = [trimmedLabel isEqualToString:@"章节要点"] || [trimmedLabel isEqualToString:@"图集"];
-    }}
+    if (!shouldHide) { 
+        shouldHide = [trimmedLabel isEqualToString:@"章节要点"] || [trimmedLabel isEqualToString:@"图集"]; 
+    } 
     
-    if (shouldHide) {{
-        self.hidden = YES;
-        for (NSLayoutConstraint *constraint in self.constraints) {{
-            constraint.active = NO;
-        }}
-        [self.superview layoutIfNeeded];
-    }}
-}}
+    if (shouldHide) { 
+        self.hidden = YES; 
+        
+        // 找到父视图是否为 UIStackView 
+        UIView *superview = self.superview; 
+        if ([superview isKindOfClass:[UIStackView class]]) { 
+            UIStackView *stackView = (UIStackView *)superview; 
+            // 刷新 UIStackView 的布局 
+            [stackView layoutIfNeeded]; 
+        } 
+    } 
+} 
 %end
 
 //去除启动视频广告
