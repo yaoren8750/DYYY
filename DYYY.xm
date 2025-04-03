@@ -413,15 +413,13 @@ static void DYYYAddCustomViewToParent(UIView *parentView, float transparency) {
     %orig(center);
 }
 
-- (void)setHidden:(BOOL)hidden {
-    BOOL shouldHide = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisHiddenEntry"];
-    
-    if (shouldHide) {
-        %orig(shouldHide);
-    } else {
-        %orig(hidden);
+- (void)layoutSubviews {
+    %orig;
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisHiddenEntry"]){
+         [self removeFromSuperview];
     }
 }
+
 %end
 
 %hook AWEPlayInteractionViewController
@@ -890,13 +888,14 @@ static void DYYYAddCustomViewToParent(UIView *parentView, float transparency) {
 %hook AWEAwemeModel
 - (id)initWithDictionary:(id)arg1 error:(id *)arg2 {
     id orig = %orig;
-    
+
+    BOOL hasLiveStreamURLProperty = [self respondsToSelector:@selector(liveStreamURL)];
     BOOL noAds = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYNoAds"];
     BOOL skipLive = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipLive"];
     BOOL skipHotSpot = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisSkipHotSpot"];
     
     BOOL shouldFilterAds = noAds && (self.hotSpotLynxCardModel || self.isAds);
-    BOOL shouldFilterRec = skipLive && [self.liveReason isEqualToString:@"rec"];
+    BOOL shouldFilterRec = skipLive && hasLiveStreamURLProperty;
     BOOL shouldFilterHotSpot = skipHotSpot && self.hotSpotLynxCardModel;
 
     BOOL shouldFilterLowLikes = NO;
@@ -1091,18 +1090,49 @@ static void DYYYAddCustomViewToParent(UIView *parentView, float transparency) {
 }
 %end
 
-//隐藏头像加号
+//隐藏头像加号和透明
 %hook LOTAnimationView
 - (void)layoutSubviews {
     %orig;
-
+    
+    // 检查是否需要隐藏加号
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideLOTAnimationView"]) {
         [self removeFromSuperview];
         return;
     }
+    
+    // 应用透明度设置
+    NSString *transparencyValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYAvatarViewTransparency"];
+    if (transparencyValue && transparencyValue.length > 0) {
+        CGFloat alphaValue = [transparencyValue floatValue];
+        if (alphaValue >= 0.0 && alphaValue <= 1.0) {
+            self.alpha = alphaValue;
+        }
+    }
 }
 %end
 
+//首页头像隐藏和透明
+%hook AWEAdAvatarView
+- (void)layoutSubviews {
+    %orig;
+    
+    // 检查是否需要隐藏头像
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideAvatarButton"]) {
+        [self removeFromSuperview];
+        return;
+    }
+    
+    // 应用透明度设置
+    NSString *transparencyValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYAvatarViewTransparency"];
+    if (transparencyValue && transparencyValue.length > 0) {
+        CGFloat alphaValue = [transparencyValue floatValue];
+        if (alphaValue >= 0.0 && alphaValue <= 1.0) {
+            self.alpha = alphaValue;
+        }
+    }
+}
+%end
 
 //移除同城吃喝玩乐提示框
 %hook AWENearbySkyLightCapsuleView
@@ -1268,6 +1298,26 @@ static void DYYYAddCustomViewToParent(UIView *parentView, float transparency) {
     }
 }
 
+// 隐藏大家都在搜留白
+%hook AWESearchAnchorListModel
+- (id)init {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideCommentViews"]) {
+        return nil;
+    }
+    return %orig;
+}
+%end
+
+// 隐藏评论汽水音乐留白
+%hook AWEMusicModel
+- (id)init {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideCommentViews"]) {
+        return nil;
+    }
+    return %orig;
+}
+%end
+
 //隐藏校园提示
 %hook AWETemplateTagsCommonView
 
@@ -1355,51 +1405,33 @@ static void DYYYAddCustomViewToParent(UIView *parentView, float transparency) {
 
 %end
 
-
-//隐藏作者声明和视频合集
+//隐藏合集和声明
 %hook AWEAntiAddictedNoticeBarView
 - (void)layoutSubviews {
     %orig;
-    
-    // 查找子视图中的UILabel
-    BOOL isAntiAddictedNotice = NO;
     BOOL isTemplateVideo = NO;
-    
+    // 查找子视图中的UILabel，检查是否包含"合集"
     for (UIView *subview in self.subviews) {
         if ([subview isKindOfClass:%c(UILabel)]) {
             UILabel *label = (UILabel *)subview;
             NSString *labelText = label.text;
-            
-            // 检查文本内容
-            if (labelText) {
-
-                // 包含"作者声明"、"就医"、"野生"、"存在"、"生成"或"理性"
-                if ([labelText containsString:@"作者声明"] || 
-                    [labelText containsString:@"就医"] || 
-                    [labelText containsString:@"生成"] ||
-                    [labelText containsString:@"存在"] ||
-                    [labelText containsString:@"野生"] ||
-                    [labelText containsString:@"理性"]) {
-
-                    isAntiAddictedNotice = YES;
-                }
-                // 包含"合集"
-                else if ([labelText containsString:@"合集"]) {
-                    isTemplateVideo = YES;
-                }
+            if (labelText && [labelText containsString:@"合集"]) {
+                isTemplateVideo = YES;
+                break;
             }
         }
     }
     
     // 根据判断结果应用相应的开关
-    if (isAntiAddictedNotice) {
-        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideAntiAddictedNotice"]) {
-            [self setHidden:YES];
-        }
-    }
-    else if (isTemplateVideo) {
+    if (isTemplateVideo) {
+        // 如果是合集，使用合集的开关
         if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideTemplateVideo"]) {
-            [self setHidden:YES];
+            [self removeFromSuperview]; 
+        }
+    } else {
+        // 如果是声明，使用声明的开关
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideAntiAddictedNotice"]) {
+            [self removeFromSuperview];
         }
     }
 }
@@ -1599,19 +1631,6 @@ static void DYYYAddCustomViewToParent(UIView *parentView, float transparency) {
 
 %end
 
-%hook AWEAdAvatarView
-
-- (void)layoutSubviews {
-    %orig;
-
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideAvatarButton"]) {
-        [self removeFromSuperview];
-        return;
-    }
-}
-
-%end
-
 %hook AWENormalModeTabBar
 
 - (void)layoutSubviews {
@@ -1650,12 +1669,44 @@ static void DYYYAddCustomViewToParent(UIView *parentView, float transparency) {
         return [@(a.frame.origin.x) compare:@(b.frame.origin.x)];
     }];
 
-    CGFloat totalWidth = self.bounds.size.width;
-    CGFloat buttonWidth = totalWidth / visibleButtons.count;
-    
-    for (NSInteger i = 0; i < visibleButtons.count; i++) {
-        UIView *button = visibleButtons[i];
-        button.frame = CGRectMake(i * buttonWidth, button.frame.origin.y, buttonWidth, button.frame.size.height);
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        // iPad端布局逻辑
+        UIView *targetView = nil;
+        CGFloat containerWidth = self.bounds.size.width;
+        CGFloat offsetX = 0;
+        
+        // 查找目标容器视图
+        for (UIView *subview in self.subviews) {
+            if ([subview class] == [UIView class] && 
+                fabs(subview.frame.size.width - self.bounds.size.width) > 0.1) {
+                targetView = subview;
+                containerWidth = subview.frame.size.width;
+                offsetX = subview.frame.origin.x;
+                break;
+            }
+        }
+        
+        // 在目标容器内均匀分布按钮
+        CGFloat buttonWidth = containerWidth / visibleButtons.count;
+        for (NSInteger i = 0; i < visibleButtons.count; i++) {
+            UIView *button = visibleButtons[i];
+            button.frame = CGRectMake(offsetX + (i * buttonWidth), 
+                                    button.frame.origin.y, 
+                                    buttonWidth, 
+                                    button.frame.size.height);
+        }
+    } else {
+        // iPhone端布局逻辑
+        CGFloat totalWidth = self.bounds.size.width;
+        CGFloat buttonWidth = totalWidth / visibleButtons.count;
+        
+        for (NSInteger i = 0; i < visibleButtons.count; i++) {
+            UIView *button = visibleButtons[i];
+            button.frame = CGRectMake(i * buttonWidth, 
+                                    button.frame.origin.y, 
+                                    buttonWidth, 
+                                    button.frame.size.height);
+        }
     }
 
     if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisHiddenBottomBg"] || [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisEnableFullScreen"]) {
@@ -2223,34 +2274,21 @@ label.textColor = [UIColor colorWithRed:173/255.0
                                          blue:230/255.0 
                                         alpha:1.0]; // 浅蓝色
     }
-    // 应用IP属地标签缩放
+    // 应用IP属地标签上移
     NSString *ipScaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
     if (ipScaleValue.length > 0) {
-        CGFloat ipScale = [ipScaleValue floatValue];
-        if (ipScale > 0 && ipScale != 1.0) {
-            // 保存原始字体大小和位置
-            UIFont *originalFont = label.font;
-            CGRect originalFrame = label.frame;
-            label.layer.anchorPoint = CGPointMake(0, label.layer.anchorPoint.y);
-            label.layer.position = CGPointMake(originalFrame.origin.x, label.layer.position.y);
-            
-            // 使用距离值进行IP属地位置偏移
-            NSString *leftOffsetValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYIPLeftShiftOffset"];
-            CGFloat leftOffset = 100.0; 
-
-            if (leftOffsetValue.length > 0) {
-                CGFloat customOffset = [leftOffsetValue floatValue];
-                if (customOffset != 0) {
-                    leftOffset = customOffset;
-                }
-            }
-
-            CGAffineTransform scaleTransform = CGAffineTransformMakeScale(ipScale, ipScale);
-            CGAffineTransform translationTransform = CGAffineTransformMakeTranslation(-leftOffset, 0);
-            label.transform = CGAffineTransformConcat(scaleTransform, translationTransform);
-           
-            label.font = originalFont;
+        UIFont *originalFont = label.font;
+        CGRect originalFrame = label.frame;
+        CGFloat offset = [[NSUserDefaults standardUserDefaults] floatForKey:@"DYYYIPLabelVerticalOffset"];
+        if (offset > 0) {
+            CGAffineTransform translationTransform = CGAffineTransformMakeTranslation(0, -offset);
+            label.transform = translationTransform;
+        } else {
+            CGAffineTransform translationTransform = CGAffineTransformMakeTranslation(0, -3);
+            label.transform = translationTransform;
         }
+        
+        label.font = originalFont;
     }
     NSString *labelColor = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYLabelColor"];
     if (labelColor.length > 0) {
@@ -2955,7 +2993,7 @@ static CGFloat currentScale = 1.0;
 
 - (void)viewWillAppear:(BOOL)animated {
     %orig;
-        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisEnableFullScreen"]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisEnableFullScreen"]) {
         UIResponder *nextResponder = [self nextResponder];
         if ([nextResponder isKindOfClass:[UIView class]]) {
             UIView *parentView = (UIView *)nextResponder;
@@ -2970,10 +3008,50 @@ static CGFloat currentScale = 1.0;
             }
         }
     }
+    
+    NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYElementScale"];
+    if ([self.accessibilityLabel isEqualToString:@"right"]) {
+        if (scaleValue.length > 0) {
+            CGFloat scale = [scaleValue floatValue];
+            if(currentScale !=  scale){
+                currentScale = scale;
+                right_tx = 0;
+                left_tx = 0;
+            }
+            if (scale > 0 && scale != 1.0) {
+                CGFloat ty = 0;
+                for(UIView *view in self.subviews){
+                    ty += (view.frame.size.height - view.frame.size.height * scale)/2;
+                }
+                if(right_tx == 0){
+                    right_tx = (self.frame.size.width - self.frame.size.width * scale)/2;
+                }
+                self.transform = CGAffineTransformMake(scale, 0, 0, scale, right_tx, ty);
+            }
+        }
+    }
+
+    if ([self.accessibilityLabel isEqualToString:@"left"]) {
+        NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
+        if (scaleValue.length > 0) {
+            CGFloat scale = [scaleValue floatValue];
+            if (scale > 0 && scale != 1.0) {
+                CGFloat ty = 0;
+                for(UIView *view in self.subviews){
+                    ty += (view.frame.size.height - view.frame.size.height * scale)/2;
+                }
+                if(left_tx == 0){
+                    left_tx = (self.frame.size.width - self.frame.size.width * scale)/2 - self.frame.size.width * (1 -scale);
+                }
+                self.transform = CGAffineTransformMake(scale, 0, 0, scale, left_tx, ty);
+            }
+        }
+    }
 }
+
 - (void)viewDidAppear:(BOOL)animated {
     %orig;
-        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisEnableFullScreen"]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYisEnableFullScreen"]) {
         UIResponder *nextResponder = [self nextResponder];
         if ([nextResponder isKindOfClass:[UIView class]]) {
             UIView *parentView = (UIView *)nextResponder;
@@ -2988,7 +3066,47 @@ static CGFloat currentScale = 1.0;
             }
         }
     }
+    
+    NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYElementScale"];
+    if ([self.accessibilityLabel isEqualToString:@"right"]) {
+        if (scaleValue.length > 0) {
+            CGFloat scale = [scaleValue floatValue];
+            if(currentScale !=  scale){
+                currentScale = scale;
+                right_tx = 0;
+                left_tx = 0;
+            }
+            if (scale > 0 && scale != 1.0) {
+                CGFloat ty = 0;
+                for(UIView *view in self.subviews){
+                    ty += (view.frame.size.height - view.frame.size.height * scale)/2;
+                }
+                if(right_tx == 0){
+                    right_tx = (self.frame.size.width - self.frame.size.width * scale)/2;
+                }
+                self.transform = CGAffineTransformMake(scale, 0, 0, scale, right_tx, ty);
+            }
+        }
+    }
+
+    if ([self.accessibilityLabel isEqualToString:@"left"]) {
+        NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
+        if (scaleValue.length > 0) {
+            CGFloat scale = [scaleValue floatValue];
+            if (scale > 0 && scale != 1.0) {
+                CGFloat ty = 0;
+                for(UIView *view in self.subviews){
+                    ty += (view.frame.size.height - view.frame.size.height * scale)/2;
+                }
+                if(left_tx == 0){
+                    left_tx = (self.frame.size.width - self.frame.size.width * scale)/2 - self.frame.size.width * (1 -scale);
+                }
+                self.transform = CGAffineTransformMake(scale, 0, 0, scale, left_tx, ty);
+            }
+        }
+    }
 }
+
 - (void)layoutSubviews {
     %orig;
 
@@ -3028,6 +3146,23 @@ static CGFloat currentScale = 1.0;
             }
         }
     }
+
+    if ([self.accessibilityLabel isEqualToString:@"left"]) {
+        NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
+        if (scaleValue.length > 0) {
+            CGFloat scale = [scaleValue floatValue];
+            if (scale > 0 && scale != 1.0) {
+                CGFloat ty = 0;
+                for(UIView *view in self.subviews){
+                    ty += (view.frame.size.height - view.frame.size.height * scale)/2;
+                }
+                if(left_tx == 0){
+                    left_tx = (self.frame.size.width - self.frame.size.width * scale)/2 - self.frame.size.width * (1 -scale);
+                }
+                self.transform = CGAffineTransformMake(scale, 0, 0, scale, left_tx, ty);
+            }
+        }
+    }
 }
 
 %end
@@ -3039,15 +3174,15 @@ static CGFloat currentScale = 1.0;
     
     self.transform = CGAffineTransformIdentity;
 
-    NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
-    CGFloat scale = 1.0; 
+    // NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
+    // CGFloat scale = 1.0; 
     
-    if (scaleValue.length > 0) {
-        CGFloat customScale = [scaleValue floatValue];
-        if (customScale > 0 && customScale != 1.0) {
-            scale = customScale;
-        }
-    }
+    // if (scaleValue.length > 0) {
+    //     CGFloat customScale = [scaleValue floatValue];
+    //     if (customScale > 0 && customScale != 1.0) {
+    //         scale = customScale;
+    //     }
+    // }
     
     // 添加文案垂直偏移支持
     NSString *descriptionOffsetValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYDescriptionVerticalOffset"];
@@ -3063,18 +3198,18 @@ static CGFloat currentScale = 1.0;
         grandParentView = parentView.superview;
     }
     
-    if (grandParentView) {
-        CGAffineTransform scaleTransform = CGAffineTransformMakeScale(scale, scale);
-        grandParentView.transform = scaleTransform;
+    // if (grandParentView) {
+    //     CGAffineTransform scaleTransform = CGAffineTransformMakeScale(scale, scale);
+    //     grandParentView.transform = scaleTransform;
 
-        CGRect scaledFrame = grandParentView.frame;
-        CGFloat translationX = -scaledFrame.origin.x;
+    //     CGRect scaledFrame = grandParentView.frame;
+    //     CGFloat translationX = -scaledFrame.origin.x;
 
-        CGAffineTransform translationTransform = CGAffineTransformMakeTranslation(translationX, verticalOffset);
-        CGAffineTransform combinedTransform = CGAffineTransformConcat(scaleTransform, translationTransform);
+    //     CGAffineTransform translationTransform = CGAffineTransformMakeTranslation(translationX, verticalOffset);
+    //     CGAffineTransform combinedTransform = CGAffineTransformConcat(scaleTransform, translationTransform);
 
-        grandParentView.transform = combinedTransform;
-    }
+    //     grandParentView.transform = combinedTransform;
+    // }
 }
 
 %end
@@ -3088,15 +3223,15 @@ static CGFloat currentScale = 1.0;
     
     self.transform = CGAffineTransformIdentity;
 
-    NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
-    CGFloat scale = 1.0; 
+    // NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
+    // CGFloat scale = 1.0; 
     
-    if (scaleValue.length > 0) {
-        CGFloat customScale = [scaleValue floatValue];
-        if (customScale > 0 && customScale != 1.0) {
-            scale = customScale;
-        }
-    }
+    // if (scaleValue.length > 0) {
+    //     CGFloat customScale = [scaleValue floatValue];
+    //     if (customScale > 0 && customScale != 1.0) {
+    //         scale = customScale;
+    //     }
+    // }
     
     // 添加文案垂直偏移支持
     NSString *descriptionOffsetValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYDescriptionVerticalOffset"];
@@ -3112,18 +3247,18 @@ static CGFloat currentScale = 1.0;
         grandParentView = parentView.superview;
     }
     
-    if (grandParentView) {
-        CGAffineTransform scaleTransform = CGAffineTransformMakeScale(scale, scale);
-        grandParentView.transform = scaleTransform;
+    // if (grandParentView) {
+    //     CGAffineTransform scaleTransform = CGAffineTransformMakeScale(scale, scale);
+    //     grandParentView.transform = scaleTransform;
 
-        CGRect scaledFrame = grandParentView.frame;
-        CGFloat translationX = -scaledFrame.origin.x;
+    //     CGRect scaledFrame = grandParentView.frame;
+    //     CGFloat translationX = -scaledFrame.origin.x;
 
-        CGAffineTransform translationTransform = CGAffineTransformMakeTranslation(translationX, verticalOffset);
-        CGAffineTransform combinedTransform = CGAffineTransformConcat(scaleTransform, translationTransform);
+    //     CGAffineTransform translationTransform = CGAffineTransformMakeTranslation(translationX, verticalOffset);
+    //     CGAffineTransform combinedTransform = CGAffineTransformConcat(scaleTransform, translationTransform);
 
-        grandParentView.transform = combinedTransform;
-    }
+    //     grandParentView.transform = combinedTransform;
+    // }
 }
 
 %end
@@ -3135,15 +3270,15 @@ static CGFloat currentScale = 1.0;
     
     self.transform = CGAffineTransformIdentity;
 
-    NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
-    CGFloat scale = 1.0; 
+    // NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
+    // CGFloat scale = 1.0; 
     
-    if (scaleValue.length > 0) {
-        CGFloat customScale = [scaleValue floatValue];
-        if (customScale > 0 && customScale != 1.0) {
-            scale = customScale;
-        }
-    }
+    // if (scaleValue.length > 0) {
+    //     CGFloat customScale = [scaleValue floatValue];
+    //     if (customScale > 0 && customScale != 1.0) {
+    //         scale = customScale;
+    //     }
+    // }
     
     // 添加垂直偏移支持
     NSString *verticalOffsetValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameVerticalOffset"];
@@ -3161,16 +3296,16 @@ static CGFloat currentScale = 1.0;
 
     // 检查祖父视图是否为 AWEBaseElementView 类型
     if (grandParentView && [grandParentView.superview isKindOfClass:%c(AWEBaseElementView)]) {
-        CGAffineTransform scaleTransform = CGAffineTransformMakeScale(scale, scale);
-        grandParentView.transform = scaleTransform;
+        // CGAffineTransform scaleTransform = CGAffineTransformMakeScale(scale, scale);
+        // grandParentView.transform = scaleTransform;
 
         CGRect scaledFrame = grandParentView.frame;
         CGFloat translationX = -scaledFrame.origin.x;
   
         CGAffineTransform translationTransform = CGAffineTransformMakeTranslation(translationX, verticalOffset);
-        CGAffineTransform combinedTransform = CGAffineTransformConcat(scaleTransform, translationTransform);
+        // CGAffineTransform combinedTransform = CGAffineTransformConcat(scaleTransform, translationTransform);
         
-        grandParentView.transform = combinedTransform;
+        grandParentView.transform = translationTransform;
     }
 }
 
@@ -4114,21 +4249,37 @@ static BOOL isDownloadFlied = NO;
 }
 %end
 
-//隐藏直播退出清屏
+//隐藏直播退出清屏、投屏按钮
 %hook IESLiveButton
 
 - (void)layoutSubviews {
     %orig; 
 
-    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideLiveRoomClear"]) {
-        return;
+    // 处理清屏按钮
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideLiveRoomClear"]) {
+        if ([self.accessibilityLabel isEqualToString:@"退出清屏"] && self.superview) {
+            [self.superview removeFromSuperview];
+        }
     }
 
-    if ([self.accessibilityLabel isEqualToString:@"退出清屏"] && self.superview) {
-        [self.superview removeFromSuperview];
+    // 投屏按钮
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideLiveRoomMirroring"]) {
+        if ([self.accessibilityLabel isEqualToString:@"投屏"] && self.superview) {
+            [self.superview removeFromSuperview];
+        }
     }
 }
 
+%end
+
+//隐藏直播间流量弹窗
+%hook AWELiveFlowAlertView
+- (void)layoutSubviews {
+    %orig;
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYHideCellularAlert"]) {
+    self.hidden = YES;
+    }
+}
 %end
 
 %ctor {

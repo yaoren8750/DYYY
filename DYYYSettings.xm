@@ -732,6 +732,7 @@ static void showUserAgreementAlert() {
                 NSArray *transparencySettings = @[
                     @{@"identifier": @"DYYYtopbartransparent", @"title": @"设置顶栏透明", @"detail": @"0-1小数", @"cellType": @26, @"imageName": @"ic_module_outlined_20"},
                     @{@"identifier": @"DYYYGlobalTransparency", @"title": @"设置全局透明", @"detail": @"0-1小数", @"cellType": @26, @"imageName": @"ic_eye_outlined_20"},
+                    @{@"identifier": @"DYYYAvatarViewTransparency", @"title": @"首页头像透明", @"detail": @"0-1小数", @"cellType": @26, @"imageName": @"ic_user_outlined_20"},
                     @{@"identifier": @"DYYYisEnableCommentBlur", @"title": @"评论区毛玻璃", @"detail": @"", @"cellType": @6, @"imageName": @"ic_comment_outlined_20"}, 
                     @{@"identifier": @"DYYYCommentBlurTransparent", @"title": @"毛玻璃透明度", @"detail": @"0-1小数", @"cellType": @26, @"imageName": @"ic_eye_outlined_20"}      
                 ];
@@ -748,7 +749,7 @@ static void showUserAgreementAlert() {
                     @{@"identifier": @"DYYYNicknameScale", @"title": @"昵称文案缩放", @"detail": @"不填默认", @"cellType": @26, @"imageName": @"ic_zoomin_outlined_20"},
                     @{@"identifier": @"DYYYNicknameVerticalOffset", @"title": @"昵称下移距离", @"detail": @"不填默认", @"cellType": @26, @"imageName": @"ic_pensketch_outlined_20"},
                     @{@"identifier": @"DYYYDescriptionVerticalOffset", @"title": @"文案下移距离", @"detail": @"不填默认", @"cellType": @26, @"imageName": @"ic_pensketch_outlined_20"},
-                    @{@"identifier": @"DYYYIPLeftShiftOffset", @"title": @"属地左移距离", @"detail": @"", @"cellType": @26, @"imageName": @"ic_pensketch_outlined_20"},
+                    @{@"identifier": @"DYYYIPLabelVerticalOffset", @"title": @"属地上移距离", @"detail": @"默认为 3", @"cellType": @26, @"imageName": @"ic_pensketch_outlined_20"},
                 ];
                 
                 for (NSDictionary *dict in scaleSettings) {
@@ -904,6 +905,7 @@ static void showUserAgreementAlert() {
                     @{@"identifier": @"DYYYHideItemTag", @"title": @"隐藏笔记标签", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
                     @{@"identifier": @"DYYYHideTemplateGroup", @"title": @"隐藏底部话题", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
                     @{@"identifier": @"DYYYHideCameraLocation", @"title": @"隐藏相机定位", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
+                    @{@"identifier": @"DYYYHideCommentViews", @"title": @"隐藏评论视图", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
                     @{@"identifier": @"DYYYHideLiveCapsuleView", @"title": @"隐藏直播胶囊", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
                     @{@"identifier": @"DYYYHideStoryProgressSlide", @"title": @"隐藏视频滑条", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
                     @{@"identifier": @"DYYYHideDotsIndicator", @"title": @"隐藏图片滑条", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
@@ -922,8 +924,10 @@ static void showUserAgreementAlert() {
                     @{@"identifier": @"DYYYHideEnterLive", @"title": @"隐藏进入直播", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
                     @{@"identifier": @"DYYYHideGiftPavilion", @"title": @"隐藏礼物展馆", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
                     @{@"identifier": @"DYYYHideLiveRoomClear", @"title": @"隐藏退出清屏", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
+                    @{@"identifier": @"DYYYHideLiveRoomMirroring", @"title": @"隐藏投屏按钮", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
                     @{@"identifier": @"DYYYHideLiveDiscovery", @"title": @"隐藏直播发现", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
-                    @{@"identifier": @"DYYYHideKTVSongIndicator", @"title": @"隐藏直播点歌", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"}
+                    @{@"identifier": @"DYYYHideKTVSongIndicator", @"title": @"隐藏直播点歌", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"},
+                    @{@"identifier": @"DYYYHideCellularAlert", @"title": @"隐藏流量提醒", @"detail": @"", @"cellType": @6, @"imageName": @"ic_eyeslash_outlined_16"}
                     
                 ];
                 for (NSDictionary *dict in livestreamSettings) {
